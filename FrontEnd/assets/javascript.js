@@ -1,66 +1,84 @@
 
 ///                   Ajouter Figure dans Gallery                                     //
-
 // Fonction affiche work
 function displayWorkFigure(work) {
+  // Création des éléments figure, figcaption et img
   const figure = document.createElement('figure');
   const figureCaption = document.createElement('figcaption');
   const figureImage = document.createElement('img');
 
+  // Configuration des propriétés de l'image
   figureImage.src = work.imageUrl;
-  figureImage.alt = work.title
+  figureImage.alt = work.title;
+
+  // Configuration du texte de la légende
   figureCaption.innerHTML = work.title;
+
+  // Ajout des attributs data-id et category-id au figure
   figure.setAttribute('data-id', work.id);
   figure.setAttribute('category-id', work.categoryId);
 
+  // Ajout de l'image et de la légende à la figure
   figure.appendChild(figureImage);
   figure.appendChild(figureCaption);
+
+  // Retourne l'élément figure complet
   return figure;
 }
+
 // Fonction pour récupérer les travaux depuis l'API.
 async function getWorks() {
   try {
-    // Effectue la requête à l'API.
+    // Effectue la requête à l'API
     const response = await fetch("http://localhost:5678/api/works");
-    // Vérifie si la réponse est valide.
+
+    // Vérifie si la réponse est valide
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
-    // Convertit la réponse en JSON et la retourne.
+
+    // Convertit la réponse en JSON et la retourne
     return await response.json();
   } catch (error) {
     console.error("Failed to fetch works:", error.message);
-    // Retourne un tableau vide en cas d'échec de la récupération des données.
+    // Retourne un tableau vide en cas d'échec de la récupération des données
     return [];
   }
 }
+
 // Fonction affichage des Figures 
 async function displayFigure() {
+  // Sélectionne le conteneur de la galerie
   const figureContainer = document.querySelector('.gallery');
+  // Vide le conteneur de la galerie
   figureContainer.innerHTML = "";
+  // Récupère les travaux depuis l'API
   const works = await getWorks();
-  // Boucle sur chaque travail récupéré pour l'afficher dans la modale
+  // Boucle sur chaque travail récupéré pour l'afficher dans la galerie
   works.forEach((work) => {
+    // Crée une figure pour chaque travail
     const figure = displayWorkFigure(work);
+    // Ajoute la figure au conteneur de la galerie
     figureContainer.appendChild(figure);
   });
 }
 
-//           Gestion des Filtres                   //
-
 // Fonction filtreElements pour filtrer les figures par catégorie
 function filtreElements(categorieId) {
-
+  // Sélectionner tous les éléments figure dans la div de la galerie
   const elements = document.querySelectorAll('div.gallery figure');
+  
+  // Parcourir chaque élément figure
   elements.forEach((element) => {
-
+    // Vérifier si l'ID de la catégorie est nul ou correspond à l'attribut category-id de l'élément
     if (categorieId === null || element.getAttribute('category-id') === String(categorieId)) {
-      element.style.display = 'block';
+      element.style.display = 'block'; // Afficher l'élément
     } else {
-      element.style.display = 'none';
+      element.style.display = 'none'; // Masquer l'élément
     }
   });
 }
+
 
 // fonction ajouter boutons dans filtre
 async function addButtonFiltre() {
@@ -110,14 +128,10 @@ function removeSelectButton() {
   document.querySelectorAll(".filterButton").forEach((item) => item.classList.remove("selected"));
 }
 
-//           Gestion des Filtres                   //
-
 // Fonction pour récupérer les catégories depuis l'API.
 async function getCategories() {
   const categories = await fetch("http://localhost:5678/api/categories");
-  //console.log(categories);
-  const categoriesJson = categories.json();
-  // console.log(categoriesJson);
+  const categoriesJson =await categories.json();
   return categoriesJson;
 }
 
@@ -279,12 +293,15 @@ async function displayFigureModal() {
   });
 }
 
-// Fonction deleteWork 
+// Fonction deleteWork
 function deleteWork(Id) {
-
+  // Demande de confirmation à l'utilisateur
   const confirmation = confirm("Êtes-vous sûr de vouloir supprimer ce projet ?");
   if (confirmation) {
+    // Récupération du token depuis le sessionStorage
     const token = sessionStorage.getItem("Token");
+
+    // Envoi de la requête DELETE à l'API
     fetch(`http://localhost:5678/api/works/${Id}`, {
       method: 'DELETE',
       headers: {
@@ -292,20 +309,23 @@ function deleteWork(Id) {
         "Authorization": `Bearer ${token}`
       }
     })
-      .then(response => {
-        if (!response.ok) {
-          throw new error('La supression du travai à echoué.');
-        }
-        const work = document.querySelector(`figure[id="${Id}"]`);
-        if (work) {
-          work.remove();
-          displayFigureModal();
-          displayFigure();
-        } else {
-          console.error('Élément à supprimer non trouvé dans la modale');
-        }
-      })
-      .catch(error => console.error(error));
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('La suppression du travail a échoué.');
+      }
+
+      // Recherche et suppression de l'élément du DOM
+      const work = document.querySelector(`figure[data-id="${Id}"]`);
+      if (work) {
+        work.remove();
+        // Appels à l'affichage des figures pour réaffiche les figures dans la galerie après la suppression.
+        displayFigureModal();
+        displayFigure();
+      } else {
+        console.error('Élément à supprimer non trouvé dans la modale');
+      }
+    })
+    .catch(error => console.error('Erreur:', error));
   }
 }
 
@@ -383,10 +403,9 @@ function addNewWork(event) {
     .catch(error => console.error(error));
 };
 
-//Preview image
+
+// Fonction affiche la prévisualisation de l'image
 function previewImage() {
-
-
   const inputImage = document.getElementById("image");
   const labelImage = document.getElementById("label-image");
   const pImage = document.querySelector("#form-photo-div > p");
@@ -395,18 +414,36 @@ function previewImage() {
   inputImage.addEventListener("change", function () {
     const selectedImage = inputImage.files[0];
 
+    // Vérifiez si un fichier a bien été sélectionné
+    if (!selectedImage) {
+      return;
+    }
+
+    // Supprimez l'ancienne prévisualisation si elle existe
+    const oldPreview = document.querySelector("#form-photo-div img");
+    if (oldPreview) {
+      oldPreview.remove();
+    }
+
+    // Créez et affichez la nouvelle prévisualisation de l'image
     const imgPreview = document.createElement("img");
     imgPreview.src = URL.createObjectURL(selectedImage);
     imgPreview.style.maxHeight = "100%";
     imgPreview.style.width = "auto";
 
-    labelImage.style.display = "none";
-    pImage.style.display = "none";
-    inputImage.style.display = "none";
-    iModalImage.style.display = "none";
+    // Cachez les autres éléments
+    if (labelImage) labelImage.style.display = "none";
+    if (pImage) pImage.style.display = "none";
+    if (inputImage) inputImage.style.display = "none";
+    if (iconeImage) iconeImage.style.display = "none";
+
     document.getElementById("form-photo-div").appendChild(imgPreview);
   });
 }
+
+// Appelez la fonction pour s'assurer qu'elle est initialisée
+//previewImage();
+
 // Fonction principale qui initialise toutes les autres au chargement de la page
 (function main() {
 
