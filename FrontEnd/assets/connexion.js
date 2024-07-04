@@ -5,7 +5,7 @@ const element = {
     email: document.querySelector("#email"),
     submit: document.querySelector("#submitUserInfo"),
 };
-
+const messageError = document.querySelector('#error');
 
 
 let boutonLogin = element.submit.addEventListener("click", (event) => {
@@ -18,29 +18,35 @@ let boutonLogin = element.submit.addEventListener("click", (event) => {
             "Content-Type": "application/json",
         },
         body: JSON.stringify({
-        email: element.email.value,
-        password: element.password.value,
+            email: element.email.value,
+            password: element.password.value,
         }),
-        })
+    })
         .then((response) => response.json())
         .then((data) => {
-            sessionStorage.setItem("Token", data.token);
+            localStorage.setItem("Token", data.token);
 
             if (data.message || data.error) {
-             ///////////////   alert("Erreur dans l\'identifiant ou le mot de passe");
-            } else {
-                sessionStorage.setItem("isConnected", JSON.stringify(true));
+                // message d'erreur 
+                //   alert("Erreur dans l\'identifiant ou le mot de passe");
+                messageError.textContent = "Erreur dans l’identifiant ou le mot de passe";
+
+
+            }
+
+            else {
+                localStorage.setItem("isConnected", JSON.stringify(true));
                 window.location.replace("index.html");
             }
         });
-    });
+});
 
 
 
 
-    
 
- 
+
+
 
 
 

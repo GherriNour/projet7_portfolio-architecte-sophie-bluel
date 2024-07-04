@@ -1,5 +1,92 @@
+// ****************************************** Gestion des filtres   ******************************************
 
-///                   Ajouter Figure dans Gallery                                     //
+// ********************** fonction ajouter boutons dans filtre
+async function addButtonFiltre() {
+  // ajout du bouton Tous
+  const button = document.createElement('button');
+  button.setAttribute('id', 'btnTous');
+  button.setAttribute("class", "filterButton selected ");
+  button.textContent = 'Tous';
+  const container = document.querySelector('.filtre');
+  // Ajout du bouton au conteneur
+  container.appendChild(button);
+  // Ajout des boutons par catégories
+  const categories = await getCategories();
+  if (categories) {
+    categories.forEach(category => {
+      // Création dynamique des boutons de catégorie
+      const button = document.createElement('button');
+      button.setAttribute('id', 'btn' + category.id);
+      button.setAttribute("class", "filterButton");
+      button.textContent = category.name;
+
+      // Ajout du bouton au conteneur
+      container.appendChild(button);
+
+      // gérer l'évènement de clic les boutons des catégories  
+      button.addEventListener('click', () => {
+        removeSelectButton();
+        const btnElement = document.getElementById('btn' + category.id);
+        btnElement.classList.add("selected"); // Ajoute la classe 'selected' à l'élément cliqué
+        filtreElements(category.id);
+      });
+    });
+  };
+  // gérer l'évènement de clic du bouto Tous
+  document.getElementById('btnTous').addEventListener('click', () => {
+    removeSelectButton();
+    const btnTous = document.getElementById('btnTous');
+    btnTous.classList.add("selected"); // Ajoute la classe 'selected' à l'élément cliqué
+    filtreElements(null)
+
+  });
+}
+//Fonction Supprime la classe 'selected' de tous les éléments 
+function removeSelectButton() {
+  document.querySelectorAll(".filterButton").forEach((item) => item.classList.remove("selected"));
+}
+
+// Fonction filtreElements pour filtrer les figures par catégorie
+function filtreElements(categorieId) {
+  // Sélectionner tous les éléments figure dans la div de la galerie
+  const elements = document.querySelectorAll('div.gallery figure');
+
+  // Parcourir chaque élément figure
+  elements.forEach((element) => {
+    // Vérifier si l'ID de la catégorie est nul ou correspond à l'attribut category-id de l'élément
+    if (categorieId === null || element.getAttribute('category-id') === String(categorieId)) {
+      element.style.display = 'block'; // Afficher l'élément
+    } else {
+      element.style.display = 'none'; // Masquer l'élément
+    }
+  });
+}
+// *****************************    Fonction pour récupérer les catégories depuis l'API.
+async function getCategories() {
+  const categories = await fetch("http://localhost:5678/api/categories");
+  const categoriesJson = await categories.json();
+  return categoriesJson;
+}
+///   *****************************   Ajouter Figure dans Gallery         ************************************
+
+// Fonction affichage des Figures 
+async function displayFigure() {
+  // Sélectionne le conteneur de la galerie
+  const figureContainer = document.querySelector('.gallery');
+  // Vide le conteneur de la galerie
+  figureContainer.innerHTML = "";
+  // Récupère les travaux depuis l'API
+  const works = await getWorks();
+  // Boucle sur chaque travail récupéré pour l'afficher dans la galerie
+  works.forEach((work) => {
+    // Crée une figure pour chaque travail
+    const figure = displayWorkFigure(work);
+    // Ajoute la figure au conteneur de la galerie
+    figureContainer.appendChild(figure);
+  });
+}
+
+
 // Fonction affiche work
 function displayWorkFigure(work) {
   // Création des éléments figure, figcaption et img
@@ -46,96 +133,10 @@ async function getWorks() {
   }
 }
 
-// Fonction affichage des Figures 
-async function displayFigure() {
-  // Sélectionne le conteneur de la galerie
-  const figureContainer = document.querySelector('.gallery');
-  // Vide le conteneur de la galerie
-  figureContainer.innerHTML = "";
-  // Récupère les travaux depuis l'API
-  const works = await getWorks();
-  // Boucle sur chaque travail récupéré pour l'afficher dans la galerie
-  works.forEach((work) => {
-    // Crée une figure pour chaque travail
-    const figure = displayWorkFigure(work);
-    // Ajoute la figure au conteneur de la galerie
-    figureContainer.appendChild(figure);
-  });
-}
-
-// Fonction filtreElements pour filtrer les figures par catégorie
-function filtreElements(categorieId) {
-  // Sélectionner tous les éléments figure dans la div de la galerie
-  const elements = document.querySelectorAll('div.gallery figure');
-  
-  // Parcourir chaque élément figure
-  elements.forEach((element) => {
-    // Vérifier si l'ID de la catégorie est nul ou correspond à l'attribut category-id de l'élément
-    if (categorieId === null || element.getAttribute('category-id') === String(categorieId)) {
-      element.style.display = 'block'; // Afficher l'élément
-    } else {
-      element.style.display = 'none'; // Masquer l'élément
-    }
-  });
-}
 
 
-// fonction ajouter boutons dans filtre
-async function addButtonFiltre() {
-  const button = document.createElement('button');
-  button.setAttribute('id', 'btnTous');
-  button.setAttribute("class", "filterButton selected ");
-  button.textContent = 'Tous';
-  const container = document.querySelector('.filtre');
-  // Ajout du bouton au conteneur
-  container.appendChild(button);
 
-  const categories = await getCategories();
-  if (categories) {
-
-    categories.forEach(category => {
-      // Création dynamique des boutons de catégorie
-      const button = document.createElement('button');
-      button.setAttribute('id', 'btn' + category.id);
-      button.setAttribute("class", "filterButton");
-      button.textContent = category.name;
-
-      // Ajout du bouton au conteneur
-      container.appendChild(button);
-
-      // gérer l'évènement de clic les boutons des catégories  
-      button.addEventListener('click', () => {
-        removeSelectButton();
-        const btnElement = document.getElementById('btn' + category.id);
-        btnElement.classList.add("selected"); // Ajoute la classe 'selected' à l'élément cliqué
-        filtreElements(category.id);
-
-      });
-
-    });
-  };
-  // gérer l'évènement de clic du bouto Tous
-  document.getElementById('btnTous').addEventListener('click', () => {
-    removeSelectButton();
-    const btnTous = document.getElementById('btnTous');
-    btnTous.classList.add("selected"); // Ajoute la classe 'selected' à l'élément cliqué
-    filtreElements(null)
-
-  });
-}
-//Fonction Supprime la classe 'selected' de tous les éléments 
-function removeSelectButton() {
-  document.querySelectorAll(".filterButton").forEach((item) => item.classList.remove("selected"));
-}
-
-// Fonction pour récupérer les catégories depuis l'API.
-async function getCategories() {
-  const categories = await fetch("http://localhost:5678/api/categories");
-  const categoriesJson =await categories.json();
-  return categoriesJson;
-}
-
-// Affiche les categories dans la liste des categories
+//  *****************************   Affiche les categories dans la liste des categories
 async function displayCategories() {
   const selectCategory = document.getElementById('modal-photo-category');
   const categories = await getCategories();
@@ -153,14 +154,13 @@ async function displayCategories() {
   }
 }
 
-//           Géstion d'affichage Login Logout                   //
+//   ***************************   Géstion d'affichage Login Logout                   //
 
 //Fonction Utilisateur connecté
 function userConnection() {
-  // si le token existe dans le sessionStorage 
-  if (sessionStorage.getItem("token"));
+  // si le token existe dans le localStorage 
+  if (localStorage.getItem("token"));
 }
-
 
 // Fonction géstion affichage Login Logout
 function displayLoginLogout() {
@@ -171,7 +171,7 @@ function displayLoginLogout() {
   const portfolioModify = document.getElementById("portfolio-l-modify");
 
   //  Mode login : Utilisateur connecté
-  if (JSON.parse(sessionStorage.getItem("isConnected"))) {
+  if (JSON.parse(localStorage.getItem("isConnected"))) {
     loginStatus.style.display = 'none';
     logoutStatus.style.display = 'block';
     portfolioModify.style.display = 'flex';
@@ -186,13 +186,13 @@ function displayLoginLogout() {
   //  Mode logout : Utilisateur déconnecté
   logoutStatus.addEventListener("click", (event) => {
     event.preventDefault();
-    sessionStorage.removeItem("Token");
-    sessionStorage.removeItem("isConnected");
+    localStorage.removeItem("Token");
+    localStorage.removeItem("isConnected");
     window.location.replace("index.html");
   });
 };
 
-// //           Géstion du Modal                   //
+// *******************************     Géstion du Modal    ***************************************
 
 //  Géstion des actions du Modal  
 function setupModalAction() {
@@ -205,7 +205,7 @@ function setupModalAction() {
       showModal();
     });
   }
-  // Bouton Ajout photo
+  // *************************     Bouton Ajout photo
   const newPhotoBtn = document.querySelector('#new-photo');
   if (newPhotoBtn) {
     newPhotoBtn.addEventListener('click', displayModalPhoto);
@@ -241,7 +241,7 @@ function hideModal() {
   modal.style.display = 'none';
 }
 
-// Fonction affiche Modal Photo
+// ************************************     Fonction affiche Modal Photo
 function displayModalPhoto() {
   const modalContent = document.querySelector('#modal-content');
   const modalPhoto = document.querySelector('#modal-photo');
@@ -257,7 +257,7 @@ function hideModalPhoto() {
 };
 
 
-//Ajouter les figures dans modal
+// *****************************    Ajouter les figures dans modal
 
 // Fonction affiche work Modal
 function displayWorkFigureModal(work) {
@@ -281,7 +281,7 @@ function displayWorkFigureModal(work) {
   return figureElement;
 };
 
-// Fonction pour afficher les figures dans la modale.
+// **********************************        Fonction pour afficher les figures dans la modale.
 async function displayFigureModal() {
   const imagesModalContainer = document.querySelector('.gallery-modal');
   imagesModalContainer.innerHTML = "";
@@ -293,13 +293,13 @@ async function displayFigureModal() {
   });
 }
 
-// Fonction deleteWork
+// **********************************            Fonction deleteWork
 function deleteWork(Id) {
   // Demande de confirmation à l'utilisateur
   const confirmation = confirm("Êtes-vous sûr de vouloir supprimer ce projet ?");
   if (confirmation) {
-    // Récupération du token depuis le sessionStorage
-    const token = sessionStorage.getItem("Token");
+    // Récupération du token depuis le localStorage
+    const token = localStorage.getItem("Token");
 
     // Envoi de la requête DELETE à l'API
     fetch(`http://localhost:5678/api/works/${Id}`, {
@@ -309,27 +309,27 @@ function deleteWork(Id) {
         "Authorization": `Bearer ${token}`
       }
     })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('La suppression du travail a échoué.');
-      }
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('La suppression du travail a échoué.');
+        }
 
-      // Recherche et suppression de l'élément du DOM
-      const work = document.querySelector(`figure[data-id="${Id}"]`);
-      if (work) {
-        work.remove();
-        // Appels à l'affichage des figures pour réaffiche les figures dans la galerie après la suppression.
-        displayFigureModal();
-        displayFigure();
-      } else {
-        console.error('Élément à supprimer non trouvé dans la modale');
-      }
-    })
-    .catch(error => console.error('Erreur:', error));
+        // Recherche et suppression de l'élément du DOM
+        const work = document.querySelector(`figure[data-id="${Id}"]`);
+        if (work) {
+          work.remove();
+          // Appels à l'affichage des figures pour réaffiche les figures dans la galerie après la suppression.
+          displayFigureModal();
+          displayFigure();
+        } else {
+          console.error('Élément à supprimer non trouvé dans la modale');
+        }
+      })
+      .catch(error => console.error('Erreur:', error));
   }
 }
 
-// Fonction Check form filled//
+//  *******************************       Fonction Check form filled 
 function checkForm() {
   const titleInput = document.getElementById('modal-photo-title');
   const categorySelect = document.getElementById('modal-photo-category');
@@ -339,7 +339,7 @@ function checkForm() {
 
 }
 
-// Fonction géstion des actions dans AddForm
+// *****************************       Fonction géstion des actions dans AddForm
 function listennerAddForm() {
   const titleInput = document.getElementById('modal-photo-title');
   const categorySelect = document.getElementById('modal-photo-category');
@@ -352,10 +352,10 @@ function listennerAddForm() {
   const btnValider = document.getElementById("modal-valider");
   btnValider.addEventListener("click", addNewWork);
 }
-// Function add new work
+// **************************           Function add new work
 function addNewWork(event) {
   event.preventDefault();
-  const token = sessionStorage.getItem("Token");
+  const token = localStorage.getItem("Token");
   const modalContent = document.querySelector('#modal-content');
   const modalPhoto = document.querySelector('#modal-photo');
   const title = document.getElementById("modal-photo-title").value;
@@ -370,8 +370,7 @@ function addNewWork(event) {
     alert("La taille de l'image ne doit pas dépasser 4 Mo.");
     return;
   }
-
-  // Envoyer le nouveau projet au Back-end
+  // ***************************         Envoyer le nouveau projet dans la requete
   const formData = new FormData();
   formData.append("title", title);
   formData.append("category", category);
@@ -404,7 +403,7 @@ function addNewWork(event) {
 };
 
 
-// Fonction affiche la prévisualisation de l'image
+// *****************************       Fonction affiche la prévisualisation de l'image
 function previewImage() {
   const inputImage = document.getElementById("image");
   const labelImage = document.getElementById("label-image");
@@ -444,7 +443,7 @@ function previewImage() {
 // Appelez la fonction pour s'assurer qu'elle est initialisée
 //previewImage();
 
-// Fonction principale qui initialise toutes les autres au chargement de la page
+// *************************       Fonction principale qui initialise toutes les autres au chargement de la page
 (function main() {
 
   // Géstion affichage Login Logout

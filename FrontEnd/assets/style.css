@@ -108,6 +108,7 @@ section {
 }
 
 body {
+	background-color: rgba(255, 254, 248, 255);
 	line-height: 1;
 }
 
@@ -175,6 +176,12 @@ h2 {
 	color: #1D6154
 }
 
+
+ul a:hover {
+	color: #B1663C;
+}
+
+/*l       Nav       */
 nav ul {
 	display: flex;
 	align-items: center;
@@ -190,16 +197,20 @@ a {
 	color: black;
 }
 
-ul a:hover {
-	color: #B1663C;
+#logout {
+	display: none;
 }
 
+#login {
+	display: block
+}
 
 #introduction {
 	display: flex;
 	align-items: center;
 }
 
+/*l       Introduction       */
 #introduction figure {
 	flex: 1
 }
@@ -222,6 +233,7 @@ ul a:hover {
 	margin-bottom: 0.5em;
 }
 
+/*l       Portfolio       */
 #portfolio h2 {
 	text-align: center;
 	margin-bottom: 1em;
@@ -246,10 +258,13 @@ ul a:hover {
 	object-fit: cover;
 }
 
+portfolio
 #contact {
 	width: 50%;
 	margin: auto;
 }
+
+/*l       Contact       */
 
 #contact>* {
 	text-align: center;
@@ -294,14 +309,14 @@ input[type="submit"] {
 	border-radius: 60px;
 }
 
+/*l       Footer       */
 footer nav ul {
 	display: flex;
 	justify-content: flex-end;
 	margin: 2em
 }
 
-
-/*filtre*/
+/*                        filtre                                     */
 
 .filtre {
 	display: flex;
@@ -335,23 +350,10 @@ button[autofocus] {
 	outline: none;
 }
 
-
-/*login*/
-
-body {
-	background-color: rgba(255, 254, 248, 255);
-}
-
-#logout {
-	display: none;
-}
-
-#login {
-	display: block
-}
-
+/*l                                Connexion                            */
 
 #connexion {
+
 	display: flex;
 	flex-direction: column;
 	align-items: center;
@@ -361,10 +363,14 @@ body {
 }
 
 #connexion h2 {
+
 	margin-bottom: 20px;
 }
-
+#connexionLogin{
+font-weight: bold;
+}
 #connexion form {
+	
 	display: flex;
 	flex-direction: column;
 	align-items: center;
@@ -382,9 +388,10 @@ body {
 
 #email,
 #password {
-	width: 300px;
-	height: 40px;
-	box-shadow: 0px 0px 15px rgba(244, 243, 237, 255);
+	height: 51px;
+	width: 379px;
+	font-size: 1.2em;
+	box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.09);
 	border-width: 0px;
 
 }
@@ -416,9 +423,12 @@ body {
 	font-size: 0.9em;
 	text-decoration: underline;
 }
+#error {
+	color: red;
+	margin-top: 15px;
+}
 
-
-/* Mode connecté */
+/*           Mode connecté          */
 
 #headerEditMode {
 	width: 100%;
@@ -487,7 +497,7 @@ body {
 
 
 
-/*Modal*/
+/*             Modal                */
 
 #modal {
 	display: none;
@@ -604,7 +614,7 @@ body {
 	border-radius: 5px;
 }
 
-/*modal form*/
+/*         modal photo        */
 
 #modal-photo {
 	background-color: #fff;
